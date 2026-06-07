@@ -52,9 +52,7 @@ let rowCount = 0;
 
 window.onload = loadExpenses;
 
-// =======================
-// LOAD FROM BACKEND
-// =======================
+// Load all expenses from backend
 async function loadExpenses() {
     try {
         const response = await fetch("http://127.0.0.1:5000/expenses");
@@ -106,9 +104,7 @@ async function loadExpenses() {
     }
 }
 
-// =======================
-// UPDATE EXPENSE
-// =======================
+// Update expense by ID
 async function updateExpense(id, button) {
 
     let row = button.closest("tr");
@@ -134,6 +130,7 @@ async function updateExpense(id, button) {
     loadExpenses();
 }
 
+// Delete expense by ID
 async function deleteExpense(id) {
 
     try {
@@ -154,9 +151,7 @@ async function deleteExpense(id) {
     }
 }
 
-// =======================
-// CALCULATE ROW TOTAL
-// =======================
+// Calculate row total
 function calculateRowTotal(row) {
 
     let inputs = row.querySelectorAll("input");
