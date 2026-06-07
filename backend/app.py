@@ -28,7 +28,6 @@ class Expense(db.Model):
     wifi = db.Column(db.Integer, nullable=False, default=0)
     miscellaneous = db.Column(db.Integer, nullable=False, default=0)
 
-# create tables once
 with app.app_context():
     db.create_all()
 
@@ -37,16 +36,14 @@ with app.app_context():
 # =========================
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "message": "Expense Tracker API is running"
-    })
+    return jsonify({"message": "Expense Tracker API is running"})
+
 
 # =========================
-# VIEW ALL EXPENSES
+# GET ALL EXPENSES
 # =========================
-@app.route("/view", methods=["GET"])
-def view_expenses():
-
+@app.route("/expenses", methods=["GET"])
+def get_expenses():
     expenses = Expense.query.order_by(Expense.id).all()
 
     return jsonify({
@@ -64,13 +61,16 @@ def view_expenses():
         ]
     })
 
-# =========================
-# ADD EXPENSE
-# =========================
-@app.route("/add", methods=["POST"])
-def add_expense():
 
+# =========================
+# CREATE EXPENSE
+# =========================
+@app.route("/expenses", methods=["POST"])
+def add_expense():
     data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
     new_expense = Expense(
         rent=data.get("rent", 0),
@@ -88,15 +88,18 @@ def add_expense():
         "id": new_expense.id
     })
 
-# =========================
-# EDIT EXPENSE
-# =========================
-@app.route("/edit", methods=["POST"])
-def edit_expense():
 
+# =========================
+# UPDATE EXPENSE
+# =========================
+@app.route("/expenses/<int:id>", methods=["PUT"])
+def update_expense(id):
     data = request.get_json()
 
-    expense = db.session.get(Expense, data["id"])
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    expense = db.session.get(Expense, id)
 
     if not expense:
         return jsonify({"error": "Expense not found"}), 404
@@ -109,19 +112,16 @@ def edit_expense():
 
     db.session.commit()
 
-    return jsonify({
-        "message": "Expense updated successfully"
-    })
+    return jsonify({"message": "Expense updated successfully"})
+
 
 # =========================
 # DELETE EXPENSE
 # =========================
-@app.route("/delete", methods=["POST"])
-def delete_expense():
+@app.route("/expenses/<int:id>", methods=["DELETE"])
+def delete_expense(id):
 
-    data = request.get_json()
-
-    expense = db.session.get(Expense, data["id"])
+    expense = db.session.get(Expense, id)
 
     if not expense:
         return jsonify({"error": "Expense not found"}), 404
@@ -129,9 +129,8 @@ def delete_expense():
     db.session.delete(expense)
     db.session.commit()
 
-    return jsonify({
-        "message": "Expense deleted successfully"
-    })
+    return jsonify({"message": "Expense deleted successfully"})
+
 
 # =========================
 # RUN APP

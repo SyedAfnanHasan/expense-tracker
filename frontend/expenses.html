@@ -57,7 +57,7 @@ window.onload = loadExpenses;
 // =======================
 async function loadExpenses() {
     try {
-        const response = await fetch("http://127.0.0.1:5000/view");
+        const response = await fetch("http://127.0.0.1:5000/expenses");
         const data = await response.json();
 
         console.log("DATA:", data);
@@ -123,13 +123,13 @@ async function updateExpense(id, button) {
         miscellaneous: Number(inputs[4].value)
     };
 
-    await fetch("http://127.0.0.1:5000/edit", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    });
+    await fetch("http://127.0.0.1:5000/expenses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+            });
 
     alert("Expense updated!");
     loadExpenses();
@@ -138,13 +138,9 @@ async function updateExpense(id, button) {
 async function deleteExpense(id) {
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/delete", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ id: id })
-        });
+        const response = await fetchfetch(`http://127.0.0.1:5000/expenses/${id}`, {
+            method: "DELETE"
+            });
 
         const result = await response.json();
         console.log(result);
