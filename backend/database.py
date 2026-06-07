@@ -14,6 +14,13 @@ db = SQLAlchemy()
 # Fetch database URL from environment variables
 db_url = os.getenv("DATABASE_URL")
 
+if not db_url:
+    raise RuntimeError("DATABASE_URL not set in environment variables")
+
+# Render PostgreSQL fix
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
 # Raise an error if DATABASE_URL is not configured
 if not db_url:
     raise RuntimeError("DATABASE_URL not set in environment variables")
