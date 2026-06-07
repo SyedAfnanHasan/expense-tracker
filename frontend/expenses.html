@@ -55,7 +55,7 @@ window.onload = loadExpenses;
 // Load all expenses from backend
 async function loadExpenses() {
     try {
-        const response = await fetch("http://127.0.0.1:5000/expenses");
+        const response = await fetch("https://expense-tracker-arjp.onrender.com/expenses");
         const data = await response.json();
 
         console.log("DATA:", data);
