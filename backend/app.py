@@ -78,6 +78,19 @@ def edit_expense():
         "error": "Expense not found"
     }), 404
 
+@app.route("/delete", methods=["POST"])
+def delete_expense():
+
+    data = request.get_json()
+    expense_id = data["id"]
+
+    global expenses
+
+    expenses = [exp for exp in expenses if exp["id"] != expense_id]
+
+    return jsonify({
+        "message": "Expense deleted successfully"
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
