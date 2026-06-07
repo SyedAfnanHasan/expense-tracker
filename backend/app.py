@@ -12,7 +12,12 @@ CORS(app)
 # =========================
 # DATABASE CONFIG
 # =========================
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+db_url = os.getenv("DATABASE_URL")
+
+if not db_url:
+    raise Exception("DATABASE_URL not set in environment variables")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -28,6 +33,16 @@ class Expense(db.Model):
     wifi = db.Column(db.Integer, nullable=False, default=0)
     miscellaneous = db.Column(db.Integer, nullable=False, default=0)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "rent": self.rent,
+            "grocery": self.grocery,
+            "electricity": self.electricity,
+            "wifi": self.wifi,
+            "miscellaneous": self.miscellaneous
+        }
+
 with app.app_context():
     db.create_all()
 
@@ -36,7 +51,7 @@ with app.app_context():
 # =========================
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Expense Tracker API is running"})
+    return jsonify({"message": "Expense Tracker API is running"}), 200
 
 
 # =========================
@@ -48,18 +63,8 @@ def get_expenses():
 
     return jsonify({
         "count": len(expenses),
-        "expenses": [
-            {
-                "id": e.id,
-                "rent": e.rent,
-                "grocery": e.grocery,
-                "electricity": e.electricity,
-                "wifi": e.wifi,
-                "miscellaneous": e.miscellaneous
-            }
-            for e in expenses
-        ]
-    })
+        "expenses": [e.to_dict() for e in expenses]
+    }), 200
 
 
 # =========================
@@ -69,8 +74,8 @@ def get_expenses():
 def add_expense():
     data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+    if not data or not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON data"}), 400
 
     new_expense = Expense(
         rent=data.get("rent", 0),
@@ -86,7 +91,7 @@ def add_expense():
     return jsonify({
         "message": "Expense added successfully",
         "id": new_expense.id
-    })
+    }), 201
 
 
 # =========================
@@ -96,8 +101,8 @@ def add_expense():
 def update_expense(id):
     data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+    if not data or not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON data"}), 400
 
     expense = db.session.get(Expense, id)
 
@@ -112,7 +117,7 @@ def update_expense(id):
 
     db.session.commit()
 
-    return jsonify({"message": "Expense updated successfully"})
+    return jsonify({"message": "Expense updated successfully"}), 200
 
 
 # =========================
@@ -129,7 +134,7 @@ def delete_expense(id):
     db.session.delete(expense)
     db.session.commit()
 
-    return jsonify({"message": "Expense deleted successfully"})
+    return jsonify({"message": "Expense deleted successfully"}), 200
 
 
 # =========================

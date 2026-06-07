@@ -38,7 +38,7 @@ def test_add_expense(client):
         "miscellaneous": 5
     })
 
-    assert response.status_code == 200
+    assert response.status_code == 201
 
     data = response.get_json()
     assert "id" in data
