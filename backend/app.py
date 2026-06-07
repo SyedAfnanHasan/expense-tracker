@@ -92,7 +92,7 @@ def edit_expense():
 
     data = request.get_json()
 
-    expense = Expense.query.get(data["id"])
+    expense = db.session.get(Expense, data["id"])
 
     if not expense:
         return jsonify({"error": "Expense not found"}), 404
@@ -117,7 +117,7 @@ def delete_expense():
 
     data = request.get_json()
 
-    expense = Expense.query.get(data["id"])
+    expense = db.session.get(Expense, data["id"])
 
     if not expense:
         return jsonify({"error": "Expense not found"}), 404
