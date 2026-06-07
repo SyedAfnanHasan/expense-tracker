@@ -27,26 +27,35 @@
     </div>
 
 </div>
+
 <script>
 async function loadExpenses() {
     try {
         const response = await fetch("http://127.0.0.1:5000/view");
         const data = await response.json();
 
+        console.log("API DATA:", data);
+
         let total = 0;
 
         data.expenses.forEach(expense => {
-            total += expense.amount;
+            total +=
+                (expense.rent || 0) +
+                (expense.grocery || 0) +
+                (expense.electricity || 0) +
+                (expense.wifi || 0) +
+                (expense.miscellaneous || 0);
         });
 
-        document.getElementById("total").innerText = "€" + total.toFixed(2);
+        document.getElementById("total").innerText =
+            "€" + total.toFixed(2);
 
     } catch (error) {
         console.log("Error fetching expenses:", error);
     }
 }
 
-loadExpenses();
+window.onload = loadExpenses;
 </script>
 
 </body>

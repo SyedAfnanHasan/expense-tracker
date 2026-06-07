@@ -10,22 +10,20 @@
 <body class="bg-light">
 
 <div class="container mt-5">
-    <div class="d-flex justify-content-end mb-3">
-    <a href="home.html" class="btn btn-outline-primary">
-        ← Home
-    </a>
-</div>
 
-    <h2 class="text-center mb-4">
-        Expense Data
-    </h2>
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Expense Data</h2>
+
+        <a href="home.html" class="btn btn-outline-primary">
+            ← Home
+        </a>
+    </div>
 
     <div class="card shadow p-4">
 
         <table class="table table-bordered align-middle">
 
             <thead class="table-dark">
-
                 <tr>
                     <th>S.No</th>
                     <th>Rent</th>
@@ -36,49 +34,10 @@
                     <th>Total</th>
                     <th style="width: 170px;">Action</th>
                 </tr>
-
             </thead>
 
             <tbody id="expenseBody">
-
-                <!-- New entry row -->
-
-                <tr>
-
-                    <td>1</td>
-
-                    <td>
-                        <input type="number" class="form-control">
-                    </td>
-
-                    <td>
-                        <input type="number" class="form-control">
-                    </td>
-
-                    <td>
-                        <input type="number" class="form-control">
-                    </td>
-
-                    <td>
-                        <input type="number" class="form-control">
-                    </td>
-
-                    <td>
-                        <input type="number" class="form-control">
-                    </td>
-
-                    <td class="total">
-                        0
-                    </td>
-
-                    <td>
-                        <button onclick="addRow(this)" class="btn btn-success btn-sm">
-                        Add Expense
-                        </button>
-                    </td>
-
-                </tr>
-
+                <!-- Data loads here -->
             </tbody>
 
         </table>
@@ -86,16 +45,101 @@
     </div>
 
 </div>
+
 <script>
 
-let rowCount = 1;
+let rowCount = 0;
 
-// calculate per row
+window.onload = loadExpenses;
+
+// =======================
+// LOAD FROM BACKEND
+// =======================
+async function loadExpenses() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/view");
+        const data = await response.json();
+
+        console.log("DATA:", data);
+
+        const tbody = document.getElementById("expenseBody");
+        tbody.innerHTML = "";
+
+        rowCount = 0;
+
+        data.expenses.forEach(expense => {
+
+            rowCount++;
+
+            let row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${rowCount}</td>
+
+                <td><input class="form-control" value="${expense.rent}"></td>
+                <td><input class="form-control" value="${expense.grocery}"></td>
+                <td><input class="form-control" value="${expense.electricity}"></td>
+                <td><input class="form-control" value="${expense.wifi}"></td>
+                <td><input class="form-control" value="${expense.miscellaneous}"></td>
+
+                <td class="total">0</td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                        onclick="updateExpense(${expense.id}, this)">
+                        Update
+                    </button>
+
+                    <button class="btn btn-danger btn-sm">
+                        Delete
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+            calculateRowTotal(row);
+        });
+
+    } catch (error) {
+        console.log("Error loading expenses:", error);
+    }
+}
+
+// =======================
+// UPDATE EXPENSE
+// =======================
+async function updateExpense(id, button) {
+
+    let row = button.closest("tr");
+    let inputs = row.querySelectorAll("input");
+
+    let data = {
+        id: id,
+        rent: Number(inputs[0].value),
+        grocery: Number(inputs[1].value),
+        electricity: Number(inputs[2].value),
+        wifi: Number(inputs[3].value),
+        miscellaneous: Number(inputs[4].value)
+    };
+
+    await fetch("http://127.0.0.1:5000/edit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    alert("Expense updated!");
+    loadExpenses();
+}
+
+// =======================
+// CALCULATE ROW TOTAL
+// =======================
 function calculateRowTotal(row) {
 
     let inputs = row.querySelectorAll("input");
-
-    if (inputs.length < 5) return;
 
     let rent = Number(inputs[0].value) || 0;
     let grocery = Number(inputs[1].value) || 0;
@@ -103,65 +147,21 @@ function calculateRowTotal(row) {
     let wifi = Number(inputs[3].value) || 0;
     let miscellaneous = Number(inputs[4].value) || 0;
 
-    let total = rent + grocery + electricity + wifi + miscellaneous;
+    let total =
+        rent + grocery + electricity + wifi + miscellaneous;
 
-    let totalCell = row.querySelector(".total");
-    if (totalCell) totalCell.innerText = total;
+    row.querySelector(".total").innerText = total;
 }
 
-// live typing
+// live update while typing
 document.addEventListener("input", function(e) {
-
     if (e.target.tagName === "INPUT") {
-
         let row = e.target.closest("tr");
         calculateRowTotal(row);
     }
 });
 
-// add new row
-function addRow(button) {
-
-    let currentRow = button.closest("tr");
-
-    // lock current row action
-    button.parentElement.innerHTML = `
-        <button class="btn btn-warning btn-sm">Update</button>
-        <button class="btn btn-danger btn-sm">Delete</button>
-    `;
-
-    // new serial number
-    let serialCell = currentRow.querySelector("td");
-    serialCell.innerText = rowCount;
-
-    rowCount++;
-
-    // create new row
-    let newRow = document.createElement("tr");
-
-    newRow.innerHTML = `
-        <td>${rowCount}</td>
-
-        <td><input type="number" class="form-control"></td>
-        <td><input type="number" class="form-control"></td>
-        <td><input type="number" class="form-control"></td>
-        <td><input type="number" class="form-control"></td>
-        <td><input type="number" class="form-control"></td>
-
-        <td class="total">0</td>
-
-        <td>
-            <button class="btn btn-success btn-sm" onclick="addRow(this)">
-                Add Expense
-            </button>
-        </td>
-    `;
-
-    document.getElementById("expenseBody").appendChild(newRow);
-
-    calculateRowTotal(newRow);
-}
-
 </script>
+
 </body>
 </html>
