@@ -90,7 +90,8 @@ async function loadExpenses() {
                         Update
                     </button>
 
-                    <button class="btn btn-danger btn-sm">
+                    <button class="btn btn-danger btn-sm"
+                        onclick="deleteExpense(${expense.id})">
                         Delete
                     </button>
                 </td>
@@ -132,6 +133,30 @@ async function updateExpense(id, button) {
 
     alert("Expense updated!");
     loadExpenses();
+}
+
+async function deleteExpense(id) {
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: id })
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+        alert("Expense deleted!");
+
+        // reload table after delete
+        loadExpenses();
+
+    } catch (error) {
+        console.log("Delete error:", error);
+    }
 }
 
 // =======================
