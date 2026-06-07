@@ -54,7 +54,7 @@ def add_expense():
     }), 201
 
 
-@routes.route("/expenses/<int:id>", methods=["PUT"])
+@routes.route("/expenses/<int:expense_id>", methods=["PUT"])
 def update_expense(expense_id):
     """Updates an existing expense by ID."""
     data = request.get_json()
@@ -75,7 +75,7 @@ def update_expense(expense_id):
     return jsonify({"message": "Updated"}), 200
 
 
-@routes.route("/expenses/<int:id>", methods=["DELETE"])
+@routes.route("/expenses/<int:expense_id>", methods=["DELETE"])
 def delete_expense(expense_id):
     """Deletes an expense by ID."""
     expense = db.session.get(Expense, expense_id)
