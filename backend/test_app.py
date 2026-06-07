@@ -8,7 +8,7 @@ from app import app
 
 
 @pytest.fixture
-def client_fixture():
+def client():
     """Creates a test client with in-memory database."""
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
@@ -20,13 +20,13 @@ def client_fixture():
         yield test_client
 
 
-def test_view_expenses(client):
+def test_view_expenses(client):  # pylint: disable=redefined-outer-name
     """Tests fetching all expense records."""
     response = client.get("/expenses")
     assert response.status_code == 200
 
 
-def test_add_expense(client):
+def test_add_expense(client):  # pylint: disable=redefined-outer-name
     """Tests adding a new expense record."""
     response = client.post("/expenses", json={
         "rent": 100,
@@ -38,7 +38,7 @@ def test_add_expense(client):
     assert response.status_code == 201
 
 
-def test_edit_expense(client):
+def test_edit_expense(client):  # pylint: disable=redefined-outer-name
     """Tests updating an existing expense record."""
 
     add_res = client.post("/expenses", json={
@@ -58,7 +58,7 @@ def test_edit_expense(client):
     assert response.status_code == 200
 
 
-def test_delete_expense(client):
+def test_delete_expense(client):  # pylint: disable=redefined-outer-name
     """Tests deleting an expense record."""
 
     add_res = client.post("/expenses", json={
