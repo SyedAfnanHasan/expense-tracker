@@ -1,21 +1,26 @@
+"""
+Expense Tracker API Routes
+
+This module defines all REST API endpoints for managing expenses,
+including creating, reading, updating, and deleting records.
+"""
+
 from flask import Blueprint, jsonify, request
 from database import db, Expense
 
+# Flask Blueprint for API routes
 routes = Blueprint("routes", __name__)
 
-# =========================
-# HOME
-# =========================
+
 @routes.route("/", methods=["GET"])
 def home():
+    """Returns API status message."""
     return jsonify({"message": "Expense Tracker API is running"}), 200
 
 
-# =========================
-# GET ALL EXPENSES
-# =========================
 @routes.route("/expenses", methods=["GET"])
 def get_expenses():
+    """Returns all expense records."""
     expenses = Expense.query.order_by(Expense.id).all()
 
     return jsonify({
@@ -24,11 +29,9 @@ def get_expenses():
     }), 200
 
 
-# =========================
-# CREATE EXPENSE
-# =========================
 @routes.route("/expenses", methods=["POST"])
 def add_expense():
+    """Creates a new expense record."""
     data = request.get_json()
 
     if not data:
@@ -51,14 +54,12 @@ def add_expense():
     }), 201
 
 
-# =========================
-# UPDATE EXPENSE
-# =========================
 @routes.route("/expenses/<int:id>", methods=["PUT"])
-def update_expense(id):
+def update_expense(expense_id):
+    """Updates an existing expense by ID."""
     data = request.get_json()
 
-    expense = db.session.get(Expense, id)
+    expense = db.session.get(Expense, expense_id)
 
     if not expense:
         return jsonify({"error": "Not found"}), 404
@@ -74,13 +75,10 @@ def update_expense(id):
     return jsonify({"message": "Updated"}), 200
 
 
-# =========================
-# DELETE EXPENSE
-# =========================
 @routes.route("/expenses/<int:id>", methods=["DELETE"])
-def delete_expense(id):
-
-    expense = db.session.get(Expense, id)
+def delete_expense(expense_id):
+    """Deletes an expense by ID."""
+    expense = db.session.get(Expense, expense_id)
 
     if not expense:
         return jsonify({"error": "Not found"}), 404
