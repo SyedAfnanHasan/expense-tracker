@@ -147,8 +147,8 @@ Or use the VS Code Live Server extension.
 |---------|----------------|------------------|
 | GET     | /expenses      | Get all expenses |
 | POST    | /expenses      | Add new expense  |
-| PUT     | /expenses/<id> | Update expense   |
-| DELETE  | /expenses/<id> | Delete expense   |
+| PUT     | /expenses/{id} | Update expense   |
+| DELETE  | /expenses/{id} | Delete expense   |
 
 ## Database
 
