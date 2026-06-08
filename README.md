@@ -114,9 +114,17 @@ pip install -r requirements.txt
 Create a `.env` file inside the `backend` directory:
 
 ```env
-DATABASE_URL=your_postgresql_connection_url
+DATABASE_URL=postgresql://username:password@host:port/database_name
 ```
-
+Example (Local PostgreSQL):
+```env
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/expense_db
+```
+Example (Cloud PostgreSQL - Render / Supabase / Railway):
+```env
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+```
+Replace `username`, `password`, `host`, `port`, and `database_name` with your actual PostgreSQL credentials.
 > Use PostgreSQL (Render or local PostgreSQL).
 
 ### 5. Run Backend Server
