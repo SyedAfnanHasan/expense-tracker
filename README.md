@@ -109,7 +109,33 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Set Environment Variables
+### 4. Create PostgreSQL Database (Local Setup)
+
+Before running the backend, you need to create the database in PostgreSQL.
+
+#### Step 1: Open PostgreSQL terminal
+
+```bash
+psql -U postgres
+```
+#### Step 2: Create the database
+
+```bash
+CREATE DATABASE expense_db;
+```
+#### Step 3: Verify the database
+
+```bash
+\l
+```
+You should see `expense_db` in the list.
+#### Step 4: Exit PostgreSQL
+
+```bash
+\q
+```
+
+### 5. Set Environment Variables
 
 Create a `.env` file inside the `backend` directory:
 
@@ -127,7 +153,7 @@ DATABASE_URL=postgresql://user:password@host:5432/dbname
 Replace `username`, `password`, `host`, `port`, and `database_name` with your actual PostgreSQL credentials.
 > Use PostgreSQL (Render or local PostgreSQL).
 
-### 5. Run Backend Server
+### 6. Run Backend Server
 
 ```bash
 python app.py
@@ -139,7 +165,7 @@ The backend will run at:
 http://127.0.0.1:5000
 ```
 
-### 6. Run Frontend
+### 7. Run Frontend
 
 Open:
 
